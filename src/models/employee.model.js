@@ -22,7 +22,7 @@ const employeeSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["public", "admin"],
+      enum: ["waiter", "cook", "reception"],
       required: true,
     },
     refreshToken: {

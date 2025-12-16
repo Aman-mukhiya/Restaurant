@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import employeeRouter from "./routes/employee.routes.js"
 
 const app = express();
 
@@ -10,7 +11,7 @@ app.use(express.json({limit: "16kb"}));
 app.use(express.urlencoded({limit: "16kb"}));// encodeds url space -> %20
 app.use(express.static("public"))// if i took any files this is where i store
 
-
 //routes
+app.use("/api",employeeRouter);
 
 export default app;
