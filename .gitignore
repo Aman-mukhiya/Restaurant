@@ -122,3 +122,5 @@ dist
 
 //ignore data
 data/
+
+public/profile/
