@@ -3,22 +3,20 @@ import path from "path";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-
-    // console.log("the url is :"+req.path);    
+    // console.log("the url is :"+req.path);
     let uploadPath = "";
-    // if (req.path.includes("profile")) {
-    //   uploadPath = "../../public/profile";
-    // } else if (req.path.includes("data")) {
-    //   uploadPath = "../../public/others";
-    // }
 
-    if (req.path.includes("auth/register")) {
-    uploadPath = path.join(process.cwd(), "public/profile");
-  } else {
-    uploadPath = path.join(process.cwd(), "public/others");
-  }
+    if (
+      req.path.includes("/registerEmployee") ||
+      req.path.includes("/updateEmployee")
+    ) {
+      uploadPath = path.join(process.cwd(), "public/profile");
+    } else {
+      uploadPath = path.join(process.cwd(), "public/others");
+    }
     cb(null, uploadPath);
   },
+
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now();
     const extension = path.extname(file.originalname);

@@ -34,7 +34,7 @@ const employeeSchema = new mongoose.Schema(
 
 employeeSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
-  this.password = await bcrypt.hash(this.password, 10);
+  this.password = await bcrypt.hash(this.password, 10); 
 });
 
 employeeSchema.methods.isPasswordCorrect = async function (password) {
@@ -44,9 +44,8 @@ employeeSchema.methods.isPasswordCorrect = async function (password) {
 employeeSchema.methods.generateAccessToken = async function(){
   return jwt.sign({
     _id: this.id,
-    name: this.name,
     role: this.role,
-    phone: this.phone
+    access: "employee"
   },process.env.ACCESS_TOKEN_SCERET,{
     expiresIn: "1d"
   });
