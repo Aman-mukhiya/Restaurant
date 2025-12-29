@@ -115,10 +115,10 @@ export const registerEmployee = asyncHandler(async (req, res) => {
     return res.status(422).json({ errors: errors.array() });
   }
 
-  console.log(req.file.destination + "/n");
-  console.log(req.file.filename);
-  console.log(req.file.path);
-  console.log(req.file.fieldname);
+  // console.log(req.file.destination + "/n");
+  // console.log(req.file.filename);
+  // console.log(req.file.path);
+  // console.log(req.file.fieldname);
 
   if (!req.admin) {
     throw new ApiError(401, "Unauthorized access");

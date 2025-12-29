@@ -1,5 +1,6 @@
-import mongoose from "mongoose";
+import mongoose , { Schema } from "mongoose";
 
+// might need settlement[false, true] datatype, it will chanage to true after the payment is done
 const orderSchema = new mongoose.Schema(
   {
     table: {

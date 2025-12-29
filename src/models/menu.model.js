@@ -18,4 +18,4 @@ const menuSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export const Menu = mongoose.modal("Menu", menuSchema);
+export const Menu = mongoose.model("Menu", menuSchema);
