@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import employeeRouter from "./routes/employee.routes.js"
 import adminRouter from "./routes/admin.routes.js"
 import menuRouter from "./routes/menu.routes.js"
+import orderRouter from "./routes/order.routes.js"
 
 const app = express();
 
@@ -20,5 +21,6 @@ app.use("/api/v1/restaurant",employeeRouter);
 //admin routes
 app.use("/api/v1/restaurant", adminRouter);
 app.use("/api/v1/restaurant", menuRouter);
+app.use("/api/v1/restaurant", orderRouter);
 
 export default app;

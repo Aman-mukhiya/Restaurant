@@ -1,12 +1,10 @@
 import mongoose, { Schema } from "mongoose";
 
-// might need settlement[false, true] datatype, it will chanage to true after the payment is done
-const orderSchema = new mongoose.Schema(
+const historySchema = new mongoose.Schema(
   {
     table: {
       type: Number,
       required: true,
-      // unique: true,
     },
     items: [
       {
@@ -24,22 +22,13 @@ const orderSchema = new mongoose.Schema(
         },
         status: {
           type: String,
-          enum: [
-            "pending",
-            "cooking",
-            "reject",
-            "fault",
-            "cancelled",
-            "cooked",
-          ],
-          default: "pending",
         },
       },
     ],
     settlement: {
       status: {
         type: Boolean,
-        default: false,
+        default: true,
       },
       reception: {
         type: Schema.Types.ObjectId,
@@ -49,7 +38,7 @@ const orderSchema = new mongoose.Schema(
     orderClear: {
       status: {
         type: Boolean,
-        default: false,
+        default: true,
       },
       waiter: {
         type: Schema.Types.ObjectId,
@@ -60,4 +49,4 @@ const orderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export const Order = mongoose.model("Order", orderSchema);
+export const History = mongoose.model("history", historySchema);

@@ -1,30 +1,39 @@
 import express from "express";
-import { createOrder } from "../controllers/orders.controller.js"
+import {
+  createOrder,
+  addOrder,
+  allTableOrders,
+  singleOrderView,
+  kitchenOrdersView,
+  changeStatusReception,
+  changeStatusCook,
+  changeStatusWaiter,
+  settleOrder,
+  clearOrder,
+} from "../controllers/orders.controller.js";
+import {
+  paramsValidator,
+  createOrderValidator,
+} from "../middleware/validator.js";
+import { auth } from "../middleware/auth.js";
 
-const router = express.Router()
+const router = express.Router();
 
 //place order with table No.
-router.post("/orders/:id", auth, createOrder);
-
-// all order of a single tabale , so table id
-router.get("/allOrderView/:id");
-
-//single order with order Id
-router.get("/singleOrderView/:id");
-
-//table view for kitchen
-router.get("/kitchenTableView");
-
-//table id for order view in kitchen
-router.get("/kitchensOrdersView/:id");
-
-//change order with order id status by cooks - accept/reject/done
-router.put("/kitchenOrderStatus/:id");
-
-//to change order status from done to faulty and not faulty
-router.put("/OderStatus/:id");
+router.post("/createOrder", auth, createOrderValidator, createOrder); // for creating new order
+router.put("/addOrders/:id", auth, paramsValidator, addOrder); // for adding order on existing table of orders
+router.get("/allOrderView", auth, allTableOrders); // all order of a single tabale , so table id
+router.get("/singleOrderView/:id", auth, paramsValidator, singleOrderView); //single order with order Id
+router.get("/kitchensOrdersView", auth, kitchenOrdersView); //table id for order view in kitchen
+router.put("/kitchenOrderStatus/:id", auth, paramsValidator, changeStatusCook); //change order status by cooks
+router.put("/oderStatus/:id", auth, paramsValidator, changeStatusWaiter); //to change order status
+router.put(
+  "/oderStatusReview/:id",
+  auth,
+  paramsValidator,
+  changeStatusReception
+); //to review the order status by reception
+router.put("/clearOrder/:id", auth, paramsValidator, clearOrder);
+router.delete("/clearOrder/:id", auth, paramsValidator, settleOrder);
 
 export default router;
-
-
-

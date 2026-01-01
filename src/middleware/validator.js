@@ -148,59 +148,6 @@ export const loginAdminValidation = [
   body("phone").optional().isMobilePhone().withMessage("Invalid phone number"),
 ];
 
-// for orders route
-export const createOrderValidator = [
-  // table
-  body("table")
-    .notEmpty()
-    .withMessage("Table is required")
-    .isInt({ min: 1 })
-    .withMessage("Table must be a number"),
-
-  // items array must exist and not be empty
-  body("items")
-    .isArray({ min: 1 })
-    .withMessage("Order must contain at least one item"),
-
-  // menu validation
-  body("items.*.menu")
-    .notEmpty()
-    .withMessage("Menu is required")
-    .custom((value) => mongoose.Types.ObjectId.isValid(value))
-    .withMessage("Invalid menu id"),
-
-  // waiter validation
-  body("items.*.waiter")
-    .notEmpty()
-    .withMessage("Waiter is required")
-    .custom((value) => mongoose.Types.ObjectId.isValid(value))
-    .withMessage("Invalid waiter id"),
-
-  // quantity validation
-  body("items.*.quantity")
-    .notEmpty()
-    .withMessage("Quantity is required")
-    .isInt({ min: 1 })
-    .withMessage("Quantity must be at least 1"),
-
-  body("items.*.status")
-    .notEmpty()
-    .withMessage("status cannot be empty")
-    .isIn(["pending", "cooking", "reject", "fault", "cancelled", "cooked"])
-    .withMessage("Invalid status"),
-
-  // optional fields (only validate if present)
-  body("items.*.cook")
-    .optional()
-    .custom((value) => mongoose.Types.ObjectId.isValid(value))
-    .withMessage("Invalid cook id"),
-
-  body("reception")
-    .optional()
-    .custom((value) => mongoose.Types.ObjectId.isValid(value))
-    .withMessage("Invalid reception id"),
-];
-
 //for Menu routes
 export const createMenuValidator = [
   body("name")
@@ -252,4 +199,74 @@ export const getAllMenuValidator = [
     .optional()
     .isIn(["asc", "desc"])
     .withMessage("sortType must be 'asc' or 'desc'."),
+];
+
+// for orders route
+export const createOrderValidator = [
+  // table
+  body("table")
+    .notEmpty()
+    .withMessage("Table is required")
+    .isInt({ min: 1 })
+    .withMessage("Table must be a number"),
+
+  // items array must exist and not be empty
+  body("items")
+    .isArray({ min: 1 })
+    .withMessage("Order must contain at least one item"),
+
+  body("items.*.quantity")
+    .notEmpty()
+    .withMessage("Quantity is required")
+    .isInt({ min: 1 })
+    .withMessage("Quantity must be at least 1"),
+];
+
+export const some = [
+  // menu validation
+  body("items.*.menu")
+    .notEmpty()
+    .withMessage("Menu is required")
+    .custom((value) => mongoose.Types.ObjectId.isValid(value))
+    .withMessage("Invalid menu id"),
+
+  // quantity validation
+  body("items.*.quantity")
+    .notEmpty()
+    .withMessage("Quantity is required")
+    .isInt({ min: 1 })
+    .withMessage("Quantity must be at least 1"),
+
+  body("items.*.status")
+    .notEmpty()
+    .withMessage("status cannot be empty")
+    .isIn(["pending", "cooking", "reject", "fault", "cancelled", "cooked"])
+    .withMessage("Invalid status"),
+
+  // optional fields (only validate if present)
+  body("items.*.cook")
+    .optional()
+    .custom((value) => mongoose.Types.ObjectId.isValid(value))
+    .withMessage("Invalid cook id"),
+
+  body("reception")
+    .optional()
+    .custom((value) => mongoose.Types.ObjectId.isValid(value))
+    .withMessage("Invalid reception id"),
+];
+
+export const updateOrder = [
+  // quantity validation
+  body("table").notEmpty().withMessage("Table is required").isInt(),
+  body("items.*.quantity")
+    .notEmpty()
+    .withMessage("Quantity is required")
+    .isInt({ min: 1 })
+    .withMessage("Quantity must be at least 1"),
+
+  body("items.*.status")
+    .notEmpty()
+    .withMessage("status cannot be empty")
+    .isIn(["pending", "cooking", "reject", "fault", "cancelled", "cooked"])
+    .withMessage("Invalid status"),
 ];
