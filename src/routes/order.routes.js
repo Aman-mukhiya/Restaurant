@@ -27,12 +27,7 @@ router.get("/singleOrderView/:id", auth, paramsValidator, singleOrderView); //si
 router.get("/kitchensOrdersView", auth, kitchenOrdersView); //table id for order view in kitchen
 router.put("/kitchenOrderStatus/:id", auth, paramsValidator, changeStatusCook); //change order status by cooks
 router.put("/oderStatus/:id", auth, paramsValidator, changeStatusWaiter); //to change order status
-router.put(
-  "/oderStatusReview/:id",
-  auth,
-  paramsValidator,
-  changeStatusReception
-); //to review the order status by reception
+router.put("/oderStatusReview/:id", auth, paramsValidator, changeStatusReception); //to review the order status by reception
 router.put("/clearOrder/:id", auth, paramsValidator, clearOrder);
 router.delete("/clearOrder/:id", auth, paramsValidator, settleOrder);
 
