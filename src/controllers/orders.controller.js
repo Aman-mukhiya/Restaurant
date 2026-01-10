@@ -141,11 +141,6 @@ export const allTableOrders = asyncHandler(async (req, res) => {
 });
 
 export const kitchenOrdersView = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(422).json({ errors: errors.array() });
-  }
-
   if (!req.admin && req.employee.role != "cook") {
     throw new ApiError(500, "Unauthorized access");
   }
@@ -206,7 +201,7 @@ export const singleOrderView = asyncHandler(async (req, res) => {
       "items._id": itemId,
     },
     {
-      items: { $elemMatch: { _id: itemId } }
+      items: { $elemMatch: { _id: itemId } },
       // "items.menu": 1,
       // "items.waiter": 1,
       // "items.cook": 1,
@@ -224,7 +219,7 @@ export const singleOrderView = asyncHandler(async (req, res) => {
 });
 
 // status would be from [faulty , cancelled]
-export const changeStatusWaiter = asyncHandler(async (req, res) => {
+export const deleteOrderWaiter = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() });
@@ -233,12 +228,11 @@ export const changeStatusWaiter = asyncHandler(async (req, res) => {
   if (!req.admin && req.employee.role != "waiter") {
     throw new ApiError(500, "Unauthorized access");
   }
-
   const tableId = req.body.table;
-  const itemId = req.body.item;
-  const statusValue = req.body.status;
+  const { id } = req.params;
+  const itemId = id;
 
-  const updatedOrder = await Order.findOneAndUpdate(
+  const deletedOrder = await Order.findOneAndUpdate(
     {
       table: Number(tableId),
       "orderClear.status": false,
@@ -246,18 +240,15 @@ export const changeStatusWaiter = asyncHandler(async (req, res) => {
       "items._id": itemId,
     },
     {
-      $set: { "items.$.status": statusValue },
+      $pull: { items: { _id: itemId } },
     },
     {
       new: true,
-      projection: {
-        items: { $elemMatch: { _id: itemId }}
-      },
     }
   );
 
-  if (!updatedOrder) {
-    throw new ApiError(500, "Something went wrong while updating");
+  if (!deletedOrder) {
+    throw new ApiError(500, "Something went wrong while deleting order");
   }
 
   return res
@@ -265,8 +256,8 @@ export const changeStatusWaiter = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         201,
-        updatedOrder,
-        "Order status changed by waiter successfully!!!"
+        deletedOrder,
+        "Order deleted by waiter successfully!!!"
       )
     );
 });
@@ -300,8 +291,8 @@ export const changeStatusCook = asyncHandler(async (req, res) => {
     {
       new: true,
       projection: {
-        items: { $elemMatch: { _id: itemId } }
-      }
+        items: { $elemMatch: { _id: itemId } },
+      },
     }
   );
 
@@ -330,20 +321,29 @@ export const clearOrder = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Unauthorized access");
   }
 
-  const { orderId } = req.params;
+  const { id } = req.params;
 
-  const waiterId = req.employee._id || req.admin._id;
+  const waiterId = req.employee?._id || req.admin?._id;
 
-  const clearedOrder = await Order.findByIdAndUpdate(orderId, {
-    $set: {
-      orderClear: {
-        status: true,
-        waiter: waiterId,
+
+
+  const clearedOrder = await Order.findByIdAndUpdate(
+    id,
+    {
+      $set: {
+        orderClear: {
+          status: true,
+          waiter: waiterId,
+        },
       },
     },
-  });
+    { new: true }
+  );
+
+  // const clearedOrder = await Order.findById(orderId);
 
   if (!clearedOrder) {
+    console.log("This is the clear order data :", clearedOrder);
     throw new ApiError(500, "Something went wrong while clearing order");
   }
 
@@ -360,7 +360,7 @@ export const clearOrder = asyncHandler(async (req, res) => {
     );
   }
 
-  const deleteOrder = await Order.findByIdAndDelete(orderId);
+  const deleteOrder = await Order.findByIdAndDelete(id);
 
   if (!deleteOrder) {
     throw new ApiError(500, "Something went wrong while deleting the order");
@@ -371,52 +371,24 @@ export const clearOrder = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, deleteOrder, "Order cleared successfully!!!"));
 });
 
-export const changeStatusReception = asyncHandler(async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(422).json({ errors: errors.array() });
-  }
-
+export const clearOrderView = asyncHandler(async (req, res) => {
   if (!req.admin && req.employee.role != "reception") {
     throw new ApiError(500, "Unauthorized access");
   }
 
-  const tableId = req.body.table;
-  const itemId = req.body.item;
-  const statusValue = req.body.status;
+  const allClearOrder = await Buffer.find();
 
-  const updatedOrder = await Order.findOneAndUpdate(
-    {
-      table: Number(tabaleId),
-      "settlement.status": false,
-      "items._id": itemId,
-    },
-    {
-      $set: { "items.$.status": statusValue },
-    },
-    {
-      new: true,
-      projection: {
-        "items.$": 1,
-        "items.menu": 1,
-        "items.waiter": 1,
-        "items.cook": 1,
-        "items.status": 1,
-      },
-    }
-  );
-
-  if (!updatedOrder) {
-    throw new ApiError(500, "Something went wrong while updating");
+  if (!allClearOrder) {
+    throw new ApiError(404, "No order found");
   }
 
   return res
     .status(200)
     .json(
       new ApiResponse(
-        201,
-        updatedOrder,
-        "Order status changed by reception successfully!!!"
+        200,
+        allClearOrder,
+        "All cleared order found successfully!!!"
       )
     );
 });
@@ -431,9 +403,10 @@ export const settleOrder = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Unauthorized access");
   }
 
-  const { orderId } = req.params;
+  const { id } = req.params;
+  const orderId = id;
 
-  const receptionId = req.employee._id || req.admin._id;
+  const receptionId = req.employee?._id || req.admin?._id;
 
   const bufferOrder = await Buffer.findByIdAndUpdate(
     orderId,
@@ -448,11 +421,11 @@ export const settleOrder = asyncHandler(async (req, res) => {
     { new: true }
   );
 
-  if (!settledOrder) {
+  if (!bufferOrder) {
     throw new ApiError(500, "Something went wrong while settling order");
   }
 
-  const historyData = settledOrder.toObject();
+  const historyData = bufferOrder.toObject();
 
   delete historyData._id;
 

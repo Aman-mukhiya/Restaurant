@@ -5,15 +5,16 @@ import {
   allTableOrders,
   singleOrderView,
   kitchenOrdersView,
-  changeStatusReception,
   changeStatusCook,
-  changeStatusWaiter,
+  deleteOrderWaiter,
   settleOrder,
   clearOrder,
+  clearOrderView
 } from "../controllers/orders.controller.js";
 import {
   paramsValidator,
   createOrderValidator,
+  deleteOrderValidation
 } from "../middleware/validator.js";
 import { auth } from "../middleware/auth.js";
 
@@ -26,9 +27,9 @@ router.get("/allOrderView", auth, allTableOrders); // all order of a single taba
 router.get("/singleOrderView/:id", auth, paramsValidator, singleOrderView); //single order with order Id
 router.get("/kitchensOrdersView", auth, kitchenOrdersView); //table id for order view in kitchen
 router.put("/kitchenOrderStatus/:id", auth, paramsValidator, changeStatusCook); //change order status by cooks
-router.put("/oderStatus/:id", auth, paramsValidator, changeStatusWaiter); //to change order status
-router.put("/oderStatusReview/:id", auth, paramsValidator, changeStatusReception); //to review the order status by reception
+router.delete("/deleteOrder/:id", auth, deleteOrderValidation, deleteOrderWaiter); // delete the order from the list
 router.put("/clearOrder/:id", auth, paramsValidator, clearOrder);
-router.delete("/clearOrder/:id", auth, paramsValidator, settleOrder);
+router.get("/clearedOrderView", auth, clearOrderView);
+router.delete("/settleOrder/:id", auth, paramsValidator, settleOrder);
 
 export default router;

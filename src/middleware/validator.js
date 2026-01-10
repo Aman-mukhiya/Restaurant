@@ -270,3 +270,53 @@ export const updateOrder = [
     .isIn(["pending", "cooking", "reject", "fault", "cancelled", "cooked"])
     .withMessage("Invalid status"),
 ];
+
+export const deleteOrderValidation = [
+  param('id')
+    .exists().withMessage('Table ID is required')
+    .isMongoId().withMessage('Invalid Table ID format'),
+
+  body('table').isInt().withMessage("Invalid table")
+]
+
+export const changeStatusWaiter = [
+  param('id')
+    .exists().withMessage('Table ID is required')
+    .isMongoId().withMessage('Invalid ID format'),
+
+  body('table').isInt().withMessage("Invalid table")
+]
+
+export const retrivedValidation = [
+  query("page").isInt().withMessage("page must be a number"),
+  query("limit").isInt().withMessage("limit must be a number"),
+  query("sortType")
+    .optional()
+    .isIn(["asc", "desc"])
+    .withMessage("sortType must be 'asc' or 'desc'."),
+]
+
+export const historyDateValidator = [
+  query("startDate")
+    .optional()
+    .isISO8601({ strict: true })
+    .withMessage("startDate must be in YYYY-MM-DD format")
+    .toDate(),
+
+  query("endDate")
+    .optional()
+    .isISO8601({ strict: true })
+    .withMessage("endDate must be in YYYY-MM-DD format")
+    .toDate(),
+
+  query().custom((_, { req }) => {
+    const { startDate, endDate } = req.query;
+
+    if (startDate && endDate) {
+      if (new Date(endDate) < new Date(startDate)) {
+        throw new Error("endDate cannot be before startDate");
+      }
+    }
+    return true;
+  }),
+];
